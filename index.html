@@ -49,73 +49,75 @@
     </div>
 </div>
 
-<script>
-    // 1. INITIALIZE SUPABASE
-    // PASTE YOUR URL AND ANON KEY HERE
+
+
+
+    <script>
+    // 1. INITIALIZE SUPABASE (Only once!)
     const supabaseUrl = 'https://pwwdhiucvdlsjhdrwzrp.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3d2RoaXVjdmRsc2poZHJ3enJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDE3NjgsImV4cCI6MjA5MDYxNzc2OH0.6yisgTkldfUq4lFw0w_0Ccqvzm_orKiOUfNwQUdeI38';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-// 2. SIGN UP LOGIC
-    async function signUp() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const status = document.getElementById('status-msg');
-
-    // Basic validation
-    if (!email || !password) {
-        status.innerText = "Please enter both email and password.";
-        status.style.color = "#ff4c4c";
-        return;
+    
+    // Use a check to prevent double-initialization if the script runs twice
+    let supabase;
+    try {
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    } catch (e) {
+        console.error("Supabase failed to initialize. Check your network/firewall.", e);
     }
 
-    try {
-        const { data, error } = await supabase.auth.signUp({ 
-            email: email, 
-            password: password 
-        });
+    // 2. SIGN UP LOGIC
+    async function signUp() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const msg = document.getElementById('status-msg');
+
+        if (!email || !password) {
+            msg.innerText = "Please fill in all fields.";
+            msg.style.color = "#ff4c4c";
+            return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({ email, password });
 
         if (error) {
-            status.innerText = error.message;
-            status.style.color = "#ff4c4c";
+            msg.innerText = error.message;
+            msg.style.color = "#ff4c4c";
         } else {
-            status.innerText = "Check your email for a confirmation link!";
-            status.style.color = "#00ff00";
+            msg.innerText = "Check your email to confirm your account!";
+            msg.style.color = "#00ff00";
         }
-    } catch (err) {
-        status.innerText = "A critical error occurred. Check the console.";
-        console.error(err);
-    }
-}
-
-// 3. LOGIN LOGIC
-async function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const msg = document.getElementById('status-msg');
-
-    if (!email || !password) {
-        msg.innerText = "Email and password are required, fam.";
-        msg.style.color = "#ff4c4c";
-        return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // 3. LOGIN LOGIC
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const msg = document.getElementById('status-msg');
 
-    if (error) {
-        msg.innerText = error.message;
-        msg.style.color = "#ff4c4c";
-    } else {
-        msg.innerText = "Bet. Logging you in...";
-        msg.style.color = "#00ff00";
-        
-        // Give it a second for the vibe, then redirect
-        setTimeout(() => {
-            window.location.href = 'map.html'; // Swap with your actual Cesium page
-        }, 1000);
+        if (!email || !password) {
+            msg.innerText = "Email and password required.";
+            msg.style.color = "#ff4c4c";
+            return;
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            msg.innerText = error.message;
+            msg.style.color = "#ff4c4c";
+        } else {
+            msg.innerText = "Login successful! Redirecting...";
+            msg.style.color = "#00ff00";
+            
+            setTimeout(() => {
+                window.location.href = 'map.html'; 
+            }, 1000);
+        }
     }
-}
 </script>
+
+
+    
 
 </body>
 </html>
