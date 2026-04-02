@@ -56,36 +56,56 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3d2RoaXVjdmRsc2poZHJ3enJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDE3NjgsImV4cCI6MjA5MDYxNzc2OH0.6yisgTkldfUq4lFw0w_0Ccqvzm_orKiOUfNwQUdeI38';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 2. SIGN UP LOGIC
-    async function signUp() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        const { data, error } = await supabase.auth.signUp({ email: email, password: password });
-        
-        if (error) {
-            document.getElementById('status-msg').innerText = error.message;
-        } else {
-            document.getElementById('status-msg').innerText = "Account created! You can now log in.";
-            document.getElementById('status-msg').style.color = "#00ff00";
-        }
+// 2. SIGN UP LOGIC
+async function signUp() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const msg = document.getElementById('status-msg');
+
+    if (!email || !password) {
+        msg.innerText = "Don't leave me hanging—fill in the fields.";
+        msg.style.color = "#ff4c4c";
+        return;
     }
 
-    // 3. LOGIN LOGIC
-    async function login() {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: password });
-        
-        if (error) {
-            document.getElementById('status-msg').innerText = error.message;
-        } else {
-            document.getElementById('status-msg').innerText = "Login successful! Welcome to Causality.";
-            document.getElementById('status-msg').style.color = "#00ff00";
-            // Next step: redirect to your CesiumJS map page here
-        }
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+        msg.innerText = error.message;
+        msg.style.color = "#ff4c4c";
+    } else {
+        msg.innerText = "Check your email to confirm, then you're good.";
+        msg.style.color = "#00ff00";
     }
+}
+
+// 3. LOGIN LOGIC
+async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const msg = document.getElementById('status-msg');
+
+    if (!email || !password) {
+        msg.innerText = "Email and password are required, fam.";
+        msg.style.color = "#ff4c4c";
+        return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        msg.innerText = error.message;
+        msg.style.color = "#ff4c4c";
+    } else {
+        msg.innerText = "Bet. Logging you in...";
+        msg.style.color = "#00ff00";
+        
+        // Give it a second for the vibe, then redirect
+        setTimeout(() => {
+            window.location.href = 'map.html'; // Swap with your actual Cesium page
+        }, 1000);
+    }
+}
 </script>
 
 </body>
