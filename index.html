@@ -57,25 +57,34 @@
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // 2. SIGN UP LOGIC
-async function signUp() {
+    async function signUp() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const msg = document.getElementById('status-msg');
+    const status = document.getElementById('status-msg');
 
+    // Basic validation
     if (!email || !password) {
-        msg.innerText = "Don't leave me hanging—fill in the fields.";
-        msg.style.color = "#ff4c4c";
+        status.innerText = "Please enter both email and password.";
+        status.style.color = "#ff4c4c";
         return;
     }
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    try {
+        const { data, error } = await supabase.auth.signUp({ 
+            email: email, 
+            password: password 
+        });
 
-    if (error) {
-        msg.innerText = error.message;
-        msg.style.color = "#ff4c4c";
-    } else {
-        msg.innerText = "Check your email to confirm, then you're good.";
-        msg.style.color = "#00ff00";
+        if (error) {
+            status.innerText = error.message;
+            status.style.color = "#ff4c4c";
+        } else {
+            status.innerText = "Check your email for a confirmation link!";
+            status.style.color = "#00ff00";
+        }
+    } catch (err) {
+        status.innerText = "A critical error occurred. Check the console.";
+        console.error(err);
     }
 }
 
